@@ -1,17 +1,15 @@
 package konrad.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @NoArgsConstructor
 @Getter
 @Entity
-@EqualsAndHashCode
 public class Message {
     @JsonIgnore
     @Id
@@ -19,11 +17,30 @@ public class Message {
     private Long id;
     @Column(length = 140)
     private String content;
-    @ManyToOne
+    @Column
+    private Date creationDate;
+
+    @ManyToOne(optional = false)
     private User author;
 
-    public Message(String content, User author) {
+    public Message(String content, User author, Date creationDate) {
         this.content = content;
         this.author = author;
+        this.creationDate = creationDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Message message = (Message) o;
+
+        return id != null ? id.equals(message.id) : message.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

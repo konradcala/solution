@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +25,8 @@ public class MessageDaoTest {
     private TestEntityManager entityManager;
     @Autowired
     private MessageDao messageDao;
+    @Autowired
+    private UserDao userDao;
 
 
     @Rule
@@ -33,10 +36,11 @@ public class MessageDaoTest {
     public void unableToSaveTooLongMessage() {
         //given
         User user = new User("testUser");
+        userDao.save(user);
 
         //when t
         expectedException.expect(DataIntegrityViolationException.class);
-        messageDao.save(new Message("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", user));
+        messageDao.save(new Message("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", user, new Date()));
     }
 
 }

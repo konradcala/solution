@@ -2,7 +2,9 @@ package konrad.service;
 
 import konrad.model.Message;
 import konrad.model.User;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class MessageServiceTest {
     private static final String USERNAME = "konrad";
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Autowired
     private MessageService messageService;
 
@@ -23,7 +27,7 @@ public class MessageServiceTest {
         String content = "some content";
 
         //when
-        Message message = messageService.saveMessage(USERNAME, content);
+        Message message = messageService.createMessage(USERNAME, content);
 
         //then
         assertThat(message.getContent()).isEqualTo(content);
@@ -33,13 +37,20 @@ public class MessageServiceTest {
     @Test
     public void shouldGetUserMessages() {
         //given
-        Message first = messageService.saveMessage(USERNAME, "first");
-        Message second = messageService.saveMessage("konrad", "second");
+        Message first = messageService.createMessage(USERNAME, "first");
+        Message second = messageService.createMessage("konrad", "second");
 
         //when
         User user = messageService.getUser("konrad");
 
         //then
-        assertThat(user.getMessages()).contains(first, second);
+        assertThat(user.getMessages()).containsExactly(second, first);
+    }
+
+    @Test
+    public void shouldThrowExceptionForTooLongContent() {
+        expectedException.expect(TooLongMessageException.class);
+        messageService.createMessage(USERNAME, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     }
 }

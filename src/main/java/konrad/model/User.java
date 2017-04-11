@@ -22,6 +22,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author")
+    @OrderBy("creationDate DESC")
     private List<Message> messages;
 
     public User(String name) {
