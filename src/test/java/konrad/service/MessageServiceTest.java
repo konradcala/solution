@@ -1,19 +1,22 @@
 package konrad.service;
 
-import konrad.model.Message;
-import konrad.model.User;
+import konrad.rest.MessageDTO;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class MessageServiceTest {
     private static final String USERNAME = "konrad";
     @Rule
@@ -27,24 +30,31 @@ public class MessageServiceTest {
         String content = "some content";
 
         //when
-        Message message = messageService.createMessage(USERNAME, content);
+        MessageDTO message = messageService.createMessage(USERNAME, content);
 
         //then
         assertThat(message.getContent()).isEqualTo(content);
-        assertThat(message.getAuthor().getName()).isEqualTo(USERNAME);
+        assertThat(message.getAuthor()).isEqualTo(USERNAME);
     }
 
     @Test
     public void shouldGetUserMessages() {
         //given
-        Message first = messageService.createMessage(USERNAME, "first");
-        Message second = messageService.createMessage("konrad", "second");
+        MessageDTO first = messageService.createMessage(USERNAME, "first");
+        MessageDTO second = messageService.createMessage(USERNAME, "second");
 
         //when
-        User user = messageService.getUser("konrad");
+        List<MessageDTO> messageDTOList = messageService.getMessagesForUser("konrad");
 
         //then
-        assertThat(user.getMessages()).containsExactly(second, first);
+        assertThat(messageDTOList).containsExactly(second, first);
+    }
+
+    @Test
+    public void shouldReturnEmptyMessageListForNonExistingUser() {
+        //when
+        expectedException.expect(UserNotFoundException.class);
+        messageService.getMessagesForUser(USERNAME);
     }
 
     @Test

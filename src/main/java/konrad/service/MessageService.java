@@ -1,10 +1,11 @@
 package konrad.service;
 
-import konrad.model.Message;
-import konrad.model.User;
+import konrad.rest.MessageDTO;
+
+import java.util.List;
 
 public interface MessageService {
-    Message createMessage(String username, String content);
+    MessageDTO createMessage(String username, String content);
 
-    User getUser(String username);
+    List<MessageDTO> getMessagesForUser(String username);
 }

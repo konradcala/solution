@@ -36,4 +36,20 @@ public class FollowServiceTest {
         User user = userDao.findByName("first");
         assertThat(user.getFollowees()).hasSize(1);
     }
+
+    @Test(expected = UserNotFoundException.class)
+    public void shouldThrowExceptionWhenFollowerNotFound() {
+        //when
+        followService.follow("first" , "second");
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void shouldThrowExceptionWhenFolloweeNotFound() {
+        //given
+        User first = new User("first");
+        userDao.save(first);
+
+        //when
+        followService.follow("first" , "second");
+    }
 }

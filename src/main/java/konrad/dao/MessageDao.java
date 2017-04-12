@@ -1,9 +1,13 @@
 package konrad.dao;
 
 import konrad.model.Message;
+import konrad.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MessageDao extends JpaRepository<Message, Long> {
+import java.util.Collection;
+import java.util.List;
 
+public interface MessageDao extends JpaRepository<Message, Long> {
+    List<Message> findMessagesByAuthorInOrderByCreationDateTimestampDesc(Collection<User> userCollection);
 
 }

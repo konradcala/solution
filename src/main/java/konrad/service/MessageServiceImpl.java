@@ -4,11 +4,13 @@ import konrad.dao.MessageDao;
 import konrad.dao.UserDao;
 import konrad.model.Message;
 import konrad.model.User;
+import konrad.rest.MessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -19,22 +21,29 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private MessageToMessageDTOConverter messageConverter;
 
     @Override
-    public Message createMessage(String username, String content) throws TooLongMessageException {
+    public MessageDTO createMessage(String username, String content) throws TooLongMessageException {
         validate(content);
         User user = userDao.findByName(username);
         if (user == null) {
             user = saveUser(username);
         }
 
-        Message message = new Message(content, user, new Date());
-        return messageDao.save(message);
+        Message message = new Message(content, user, new Date().getTime());
+        Message saved = messageDao.save(message);
+        return messageConverter.convertToMessageJson(saved);
     }
 
     @Override
-    public User getUser(String username) {
-        return userDao.findByName(username);
+    public List<MessageDTO> getMessagesForUser(String username) {
+        User user = userDao.findByName(username);
+        if (user == null) {
+            throw new UserNotFoundException(username);
+        }
+        return messageConverter.convertToMessageJson(user.getMessages());
     }
 
 
