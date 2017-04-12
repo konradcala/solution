@@ -40,3 +40,6 @@ curl -v -H "Content-Type: application/json" -X POST -d 'nonExistingUser' http://
 
 #non existing user tries to follow some other user, 404 not found status is returned and error
 curl -v -H "Content-Type: application/json" -X POST -d 'alice' http://localhost:8080/follow/someOtherNonExistingUser -w '\n'
+
+#non existing user tries to display their messages
+curl http://localhost:8080/messages/someNotExistingUser -w '\n'
